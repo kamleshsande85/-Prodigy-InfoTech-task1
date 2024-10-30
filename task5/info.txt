@@ -1,0 +1,63 @@
+To create a basic network packet sniffer, you can use the `scapy` library in Python. This tool will capture network packets and display key information such as source and destination IP addresses, protocols, and payload data. Below is a step-by-step guide and implementation:
+
+### 1. **Installation**
+   - First, install the `scapy` library if you haven't already. You can install it using pip:
+     ```bash
+     pip install scapy
+     ```
+
+### 2. **Code Implementation**
+
+```python
+from scapy.all import sniff
+from scapy.layers.inet import IP, TCP, UDP
+
+def packet_callback(packet):
+    # Check if the packet has an IP layer
+    if IP in packet:
+        ip_src = packet[IP].src
+        ip_dst = packet[IP].dst
+        protocol = packet[IP].proto
+        
+        # Determine the protocol
+        if protocol == 6:  # TCP
+            proto_name = "TCP"
+        elif protocol == 17:  # UDP
+            proto_name = "UDP"
+        else:
+            proto_name = "Other"
+        
+        print(f"Source IP: {ip_src} -> Destination IP: {ip_dst} | Protocol: {proto_name}")
+        
+        # If the packet contains TCP or UDP layer, display payload
+        if packet.haslayer(TCP) or packet.haslayer(UDP):
+            payload = packet[IP].payload
+            print(f"Payload: {bytes(payload)}")
+        print("-" * 50)
+
+# Start sniffing packets on the network
+print("Starting packet sniffing...")
+sniff(prn=packet_callback, store=0)
+```
+
+### 3. **Explanation**
+
+- **Packet Sniffing:**
+  - The `sniff()` function from the `scapy` library is used to capture packets. The `prn` parameter allows us to define a callback function that processes each captured packet.
+  
+- **Packet Callback Function:**
+  - The `packet_callback` function is called for each captured packet. It checks if the packet contains an IP layer and extracts the source and destination IP addresses.
+  - It also determines the protocol used (TCP, UDP, or other) and prints this information.
+  - If the packet contains a TCP or UDP layer, the payload is extracted and displayed.
+
+- **Output:**
+  - The tool prints the source and destination IP addresses, the protocol used, and the payload data (if available) for each captured packet.
+
+### 4. **Ethical Considerations**
+   - **Permissions:** Ensure that you have the proper permissions to sniff network traffic on the network you are testing. Unauthorized packet sniffing can be illegal.
+   - **Use Cases:** This tool is designed for educational purposes, such as learning about network protocols and packet structures. Use it responsibly.
+
+### 5. **Running the Tool**
+   - Execute the script on a machine with the appropriate network permissions. It will start capturing and displaying the network packets in real-time. To stop the capture, you can interrupt the program (usually by pressing `Ctrl + C`).
+
+This basic network packet analyzer gives you a good starting point for understanding how network sniffing works and can be further expanded to include more detailed analysis or filtering of specific types of packets.

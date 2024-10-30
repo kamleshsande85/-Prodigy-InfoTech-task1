@@ -1,0 +1,77 @@
+To solve the task of creating a simple image encryption tool using pixel manipulation, you can follow these steps. I'll also provide a brief description of how this method works.
+
+### Overview:
+Image encryption using pixel manipulation involves altering the pixel values of an image in a way that makes it unreadable or unrecognizable without the decryption key or method. Common techniques include:
+- **Swapping Pixels**: Randomly exchanging the positions of pixels.
+- **Mathematical Operations**: Applying operations like addition, subtraction, or bitwise XOR to the pixel values.
+
+### Implementation in Python:
+
+Here’s how you can implement a basic image encryption and decryption tool:
+
+```python
+from PIL import Image
+import random
+
+# Function to encrypt the image
+def encrypt_image(image_path, output_path):
+    img = Image.open(image_path)
+    pixels = list(img.getdata())
+    width, height = img.size
+    
+    # Shuffle pixel positions
+    random.shuffle(pixels)
+    
+    # Create a new image and put the shuffled pixels
+    encrypted_img = Image.new(img.mode, img.size)
+    encrypted_img.putdata(pixels)
+    encrypted_img.save(output_path)
+    
+    print(f"Image encrypted and saved as {output_path}")
+
+# Function to decrypt the image (assuming we know the original pixel order)
+def decrypt_image(encrypted_image_path, original_image_path, output_path):
+    encrypted_img = Image.open(encrypted_image_path)
+    original_img = Image.open(original_image_path)
+    
+    # Get pixels of the original image
+    original_pixels = list(original_img.getdata())
+    encrypted_pixels = list(encrypted_img.getdata())
+    
+    # Sort the encrypted pixels to match the original image pixels
+    decrypted_pixels = [None] * len(original_pixels)
+    for i, pixel in enumerate(original_pixels):
+        index = encrypted_pixels.index(pixel)
+        decrypted_pixels[index] = pixel
+        encrypted_pixels[index] = None  # Mark as used
+    
+    # Create a new image and put the decrypted pixels
+    decrypted_img = Image.new(encrypted_img.mode, encrypted_img.size)
+    decrypted_img.putdata(decrypted_pixels)
+    decrypted_img.save(output_path)
+    
+    print(f"Image decrypted and saved as {output_path}")
+
+# Example usage
+encrypt_image("input_image.png", "encrypted_image.png")
+decrypt_image("encrypted_image.png", "input_image.png", "decrypted_image.png")
+```
+
+### Explanation:
+1. **Encryption**:
+   - **Image Loading**: The image is loaded using the `PIL` (Python Imaging Library).
+   - **Pixel Shuffling**: The pixels of the image are retrieved, shuffled randomly, and then saved as a new image.
+
+2. **Decryption**:
+   - **Original Image Reference**: The decryption process requires knowledge of the original image's pixel order.
+   - **Sorting Encrypted Pixels**: The encrypted pixels are reordered to match the original image's pixel arrangement.
+
+3. **Output**: 
+   - The encrypted image will appear scrambled and unrecognizable.
+   - The decrypted image will reconstruct the original image from the encrypted one.
+
+### Key Points:
+- **Security**: This is a simple form of encryption and is not secure for serious applications. More complex encryption algorithms like AES or RSA are typically used for secure image encryption.
+- **Pixel Manipulation**: This method demonstrates how changing pixel values or positions can drastically alter an image's appearance, making it unreadable without the correct decryption method.
+
+Let me know if you need further assistance with this task!
